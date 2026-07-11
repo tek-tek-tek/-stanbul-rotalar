@@ -1,1 +1,857 @@
 
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>İstanbul Saklı Rotaları v11.2</title>
+    <style>
+        :root {
+            --bg-overlay: rgba(245, 247, 246, 0.82);
+            --panel-bg: rgba(255, 255, 255, 0.85);   
+            --text-main: #232b26;
+            --text-muted: #59665f;
+            --accent: #6b8276;
+            --btn-bg: rgba(0, 0, 0, 0.05);
+            --border-radius: 24px;
+            --blur-effect: blur(12px);
+        }
+
+        .gece-modu {
+            --bg-overlay: rgba(20, 26, 23, 0.85);
+            --panel-bg: rgba(36, 44, 41, 0.85);
+            --text-main: #e2e8e5;
+            --text-muted: #83948b;
+            --accent: #92a89c;
+            --btn-bg: rgba(255, 255, 255, 0.08);
+        }
+
+        body {
+            background-image: url('https://images.unsplash.com/photo-1527838832700-50592524df7e?auto=format&fit=crop&w=1000&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            margin: 0;
+            padding: 15px;
+            font-family: system-ui, -apple-system, sans-serif;
+            color: var(--text-main);
+            min-height: 100vh;
+            box-sizing: border-box;
+            padding-top: 65px;
+        }
+
+        .arka-plan-ortu {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--bg-overlay);
+            z-index: -1;
+            transition: background-color 0.4s;
+        }
+
+        .ust-bar {
+            position: fixed;
+            top: 0; left: 0; right: 0; height: 55px;
+            background-color: var(--panel-bg);
+            backdrop-filter: var(--blur-effect);
+            -webkit-backdrop-filter: var(--blur-effect);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            z-index: 900;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .ust-bar h1 { font-size: 16px; font-weight: 600; margin: 0; }
+
+        /* YAN MENÜ */
+        .yan-menu-ortu { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); z-index: 998; display: none; }
+        .yan-menu {
+            position: fixed; top: 0; left: -280px; width: 280px; height: 100%;
+            background-color: var(--panel-bg); backdrop-filter: var(--blur-effect); -webkit-backdrop-filter: var(--blur-effect);
+            z-index: 999; transition: left 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+            box-shadow: 5px 0 25px rgba(0,0,0,0.15); padding: 20px; box-sizing: border-box;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        .yan-menu.acik { left: 0; }
+
+        .menu-profil-ozet { display: flex; align-items: center; gap: 12px; border-bottom: 1px solid rgba(0,0,0,0.08); padding-bottom: 15px; }
+        .menu-avatar { width: 45px; height: 45px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 14px; text-transform: uppercase; overflow: hidden; }
+        .menu-avatar img { width: 100%; height: 100%; object-fit: cover; }
+
+        .menu-ogeleri { display: flex; flex-direction: column; gap: 6px; }
+        .menu-link { padding: 12px 14px; border-radius: 12px; color: var(--text-main); text-decoration: none; font-size: 13px; font-weight: 500; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: background 0.2s; }
+        .menu-link:hover { background: rgba(0,0,0,0.04); }
+
+        /* MODAL PANELLER */
+        .tam-ekran-panel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: var(--bg-overlay); backdrop-filter: var(--blur-effect); -webkit-backdrop-filter: var(--blur-effect); z-index: 1000; display: none; padding: 20px; box-sizing: border-box; overflow-y: auto; }
+        .panel-ust-alan { display: flex; justify-content: flex-start; align-items: center; gap: 12px; margin-bottom: 20px; }
+
+        .ana-yapi { display: flex; flex-direction: column; gap: 15px; }
+        .panel { background-color: var(--panel-bg); backdrop-filter: var(--blur-effect); -webkit-backdrop-filter: var(--blur-effect); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: var(--border-radius); padding: 18px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.03); }
+        .panel-baslik { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.8px; color: var(--text-muted); margin-bottom: 10px; }
+
+        button, .link-buton { font-family: inherit; background-color: var(--btn-bg); color: var(--text-main); border: none; padding: 10px 16px; border-radius: 30px; font-size: 12px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: inline-block; text-align: center; text-decoration: none; }
+        button:active, .link-buton:active { transform: scale(0.96); }
+
+        .form-grubu { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; max-width: 100%; }
+        input, select { border: 1px solid rgba(0,0,0,0.1); background: rgba(255,255,255,0.6); padding: 10px 14px; border-radius: 20px; font-size: 13px; color: var(--text-main); outline: none; font-family: inherit; box-sizing: border-box; }
+        .gece-modu input, .gece-modu select { background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.1); }
+
+        .foto-izgara { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 15px; }
+        .foto-kart { background: var(--panel-bg); border-radius: 16px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: flex; flex-direction: column; }
+        .foto-kart img { width: 100%; height: 130px; object-fit: cover; display: block; }
+        .foto-detay-alan { padding: 10px; font-size: 11px; display: flex; flex-direction: column; gap: 4px; }
+        .foto-yazar { font-weight: 600; color: var(--accent); display: flex; align-items: center; justify-content: space-between; }
+
+        .rota-listesi { display: flex; flex-direction: column; gap: 8px; }
+        .mekan-karti { background-color: rgba(0, 0, 0, 0.02); padding: 12px 16px; border-radius: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+        .gece-modu .mekan-karti { background-color: rgba(255, 255, 255, 0.02); }
+        .alt-bilgi { font-size: 10px; color: var(--text-muted); margin-top: 2px; }
+        
+        .yorum-alani { margin-top: 20px; border-top: 1px solid rgba(0, 0, 0, 0.06); padding-top: 15px; }
+        .yorum-listesi { max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-top: 10px; }
+        .yorum-tekil { font-size: 12px; background-color: rgba(0,0,0,0.02); padding: 10px 14px; border-radius: 16px; line-height: 1.4; }
+        .gece-modu .yorum-tekil { background-color: rgba(255,255,255,0.02); }
+        .yorum-ust-bilgi { display: flex; justify-content: space-between; align-items: center; font-weight: 600; margin-bottom: 4px; font-size: 11px; color: var(--accent); }
+        .unvan-etiket { font-size: 9px; padding: 1px 6px; border-radius: 8px; background: rgba(0,0,0,0.06); color: var(--text-muted); font-weight: normal; margin-left: 5px; }
+        .skor-etiket { font-size: 11px; background: rgba(0,0,0,0.04); padding: 4px 8px; border-radius: 10px; font-weight: 500; margin-top: 4px; display: inline-block; }
+        
+        .admin-sil-btn { background: #ff4d4d; color: white; border-radius: 6px; padding: 2px 6px; font-size: 10px; cursor: pointer; border:none; }
+        .admin-badge { background: gold; color: #b38600; font-size: 9px; font-weight: bold; border: 1px solid; padding: 1px 4px; border-radius: 4px; }
+        
+        .ozel-dosya-yukle { border: 2px dashed var(--accent); padding: 15px; border-radius: 16px; text-align: center; font-size: 12px; cursor: pointer; background: rgba(0,0,0,0.01); margin-top: 10px; }
+        .profil-resim-buyuk { width: 80px; height: 80px; border-radius: 50%; object-fit: cover; margin: 0 auto 10px auto; display: block; border: 2px solid var(--accent); }
+        
+        /* LIKE BUTONU */
+        .like-btn { background: none; border: none; padding: 0; color: var(--text-muted); font-size: 11px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+        .like-btn.begenildi { color: #e0245e; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="arka-plan-ortu"></div>
+
+    <!-- ÜST BAR -->
+    <div class="ust-bar">
+        <button onclick="menuToggle(true)" style="font-size: 18px; padding: 6px 12px;">☰</button>
+        <h1>İstanbul Kaşifleri</h1>
+        <button onclick="temaDegistir()">🌓</button>
+    </div>
+
+    <!-- YAN MENÜ -->
+    <div class="yan-menu-ortu" id="menuOrtu" onclick="menuToggle(false)"></div>
+    <div class="yan-menu" id="yanMenu">
+        <div class="menu-profil-ozet" id="menuProfilAlani"></div>
+        
+        <div class="menu-ogeleri">
+            <div class="menu-link" onclick="panelAc('profilPanel')">👤 Gezgin Profilim</div>
+            <div class="menu-link" onclick="panelAc('fotoPanel')">📸 Gezgin Paylaşımları</div>
+            <div class="menu-link" id="adminMenuLinki" style="display:none; color: #b38600; font-weight:bold;" onclick="panelAc('adminPanel')">🛠️ Admin Kontrol Paneli</div>
+            <div class="menu-link" id="authMenuLinki" onclick="panelAc('authPanel')">🔑 Giriş Yap / Kaydol</div>
+            <div class="menu-link" id="cikisMenuLinki" style="display:none; color:#ff4d4d;" onclick="hesapCikisyap()">🚪 Oturumu Kapat</div>
+        </div>
+        <div style="margin-top: auto; font-size: 10px; color: var(--text-muted); text-align: center;">Saklı Rota Projesi v11.2</div>
+    </div>
+
+    <!-- MODAL: GİRİŞ YAP / KAYDOL -->
+    <div class="tam-ekran-panel" id="authPanel">
+        <div class="panel-ust-alan">
+            <button onclick="panelKapat('authPanel')" style="background: none; font-size: 22px; padding: 0 5px; color: var(--text-main);">←</button>
+            <h2 style="margin: 0; font-size: 18px;">🔑 Gezgin Giriş Sistemi</h2>
+        </div>
+        <div class="panel" style="margin-bottom: 15px;">
+            <div class="panel-baslik">Mevcut Hesaba Giriş</div>
+            <div class="form-grubu">
+                <input type="text" id="girisUser" placeholder="Kullanıcı Adı">
+                <input type="password" id="girisPass" placeholder="Şifre">
+                <button onclick="hesapGirisYap()" style="background: var(--text-main); color: var(--panel-bg);">Giriş Yap</button>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-baslik">Yeni Kaşif Kaydı</div>
+            <div class="form-grubu">
+                <input type="text" id="kayitUser" placeholder="Yeni Kullanıcı Adı">
+                <input type="password" id="kayitPass" placeholder="Güçlü Bir Şifre">
+                <button onclick="hesapKayitOl()" style="background: var(--accent); color: white;">Kayıt Ol ve Hesap Aç</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PROFİL -->
+    <div class="tam-ekran-panel" id="profilPanel">
+        <div class="panel-ust-alan">
+            <button onclick="panelKapat('profilPanel')" style="background: none; font-size: 22px; padding: 0 5px; color: var(--text-main);">←</button>
+            <h2 style="margin: 0; font-size: 18px;">👤 Gezgin Kartı</h2>
+        </div>
+        <div id="profilDetayIcerik"></div>
+    </div>
+
+    <!-- MODAL: DİNAMİK FOTOĞRAF PAYLAŞIM AKIŞI -->
+    <div class="tam-ekran-panel" id="fotoPanel">
+        <div class="panel-ust-alan">
+            <button onclick="panelKapat('fotoPanel')" style="background: none; font-size: 22px; padding: 0 5px; color: var(--text-main);">←</button>
+            <h2 style="margin: 0; font-size: 18px;">📸 Gezginlerin Kadrajı</h2>
+        </div>
+        <div class="panel" id="fotoPaylasimFormuKonteyner"></div>
+        <div class="panel-baslik" style="margin-top: 20px;">Keşif Akışı</div>
+        <div class="foto-izgara" id="kullaniciFotoAkisi"></div>
+    </div>
+
+    <!-- MODAL: ADMİN PANELİ -->
+    <div class="tam-ekran-panel" id="adminPanel">
+        <div class="panel-ust-alan">
+            <button onclick="panelKapat('adminPanel')" style="background: none; font-size: 22px; padding: 0 5px; color: #b38600;">←</button>
+            <h2 style="margin: 0; font-size: 18px; color: #b38600;">🛠️ Yönetici Kontrol Merkezi</h2>
+        </div>
+        <div class="panel" style="margin-bottom: 15px;">
+            <div class="panel-baslik">➕ Yeni Gizli Rota Ekle</div>
+            <div class="form-grubu">
+                <input type="text" id="admRotaId" placeholder="Mekan ID (Örn: kizkulesi)">
+                <input type="text" id="admRotaAd" placeholder="Rota Adı (Örn: Kız Kulesi)">
+                <input type="text" id="admRotaIlce" placeholder="İlçe (Örn: Üsküdar)">
+                <input type="text" id="admRotaAkt" placeholder="Aktivite Tipleri (Örn: tarih manzara)">
+                <input type="text" id="admRotaMetin" placeholder="Kısa Açıklama Yazısı">
+                <button onclick="adminRotaEkle()" style="background:#4285F4; color:white;">Rotayı Sisteme Enjekte Et</button>
+            </div>
+        </div>
+        <div class="panel">
+            <div class="panel-baslik">👥 Kayıtlı Üyeler</div>
+            <div id="adminUyeListesi" style="font-size: 12px; display:flex; flex-direction:column; gap:6px;"></div>
+        </div>
+    </div>
+
+    <!-- ANA GÖRÜNÜM PANELLERİ -->
+    <div class="ana-yapi">
+        <!-- FİLTRELEME -->
+        <div class="panel">
+            <div class="panel-baslik">🔍 Filtreleme Paneli</div>
+            <div class="form-grubu">
+                <select id="filtreIlce" onchange="rotalariFiltrele()">
+                    <option value="all">Tüm İlçeler</option>
+                    <option value="Beykoz">Beykoz</option>
+                    <option value="Kartal">Kartal</option>
+                    <option value="Fatih">Fatih</option>
+                    <option value="Sarıyer">Sarıyer</option>
+                </select>
+                <select id="filtreAkt" onchange="rotalariFiltrele()">
+                    <option value="all">Tüm Aktiviteler</option>
+                    <option value="doga">🌲 Doğa</option>
+                    <option value="tarih">🏛️ Tarih</option>
+                    <option value="manzara">🌅 Manzara</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- ROTA DETAYI -->
+        <div class="panel">
+            <div class="panel-baslik">Seçili Rota Detayları</div>
+            <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <h3 id="detayBaslik" style="margin: 0 0 4px 0;">Keşfetmek İçin Alttan Bir Rota Seçin</h3>
+                <div id="favoriBtnAlani"></div>
+            </div>
+            <div id="skorAlani"></div> 
+            <p id="detayMetin" style="font-size: 13px; line-height: 1.5; margin: 10px 0 0 0;"></p>
+            
+            <div class="detay-aksiyonlar" id="haritaKonteyner" style="display: none; margin-top:12px;">
+                <a id="haritaAramaLinki" href="#" target="_blank" class="link-buton" style="background-color: #4285F4; color: white; font-weight: 600; width: 100%; box-sizing: border-box;">🗺️ Haritada Bul & Yol Tarifi Al</a>
+            </div>
+
+            <!-- SOSYAL YORUM ALANI -->
+            <div class="yorum-alani" id="yorumAlaniKonteyner" style="display: none;">
+                <div class="panel-baslik">💬 Topluluk Değerlendirmeleri</div>
+                <div id="yorumYazmaFormu"></div>
+                <div class="yorum-listesi" id="yorumListesiGorunumu"></div>
+            </div>
+        </div>
+
+        <!-- LİSTE -->
+        <div class="panel">
+            <div class="panel-baslik">Gizli Keşif Noktaları</div>
+            <div class="rota-listesi" id="anaRotaListesiElementi"></div>
+        </div>
+    </div>
+
+    <script>
+        const varsayilanRotalar = {
+            yoros: { baslik: "Yoros Kalesi", ilce: "Beykoz", aktivite: "tarih manzara", metin: "Boğaz'ın bittiği yerdeki bu eşsiz antik kale, muazzam manzarasıyla tam bir kafa dinleme alanıdır.", maps: "https://www.google.com/search?q=Yoros+Kalesi+Anadolu+Kavagi+Istanbul+Yol+Tarifi" },
+            aydos: { baslik: "Aydos Ormanı", ilce: "Kartal", aktivite: "doga manzara", metin: "Şehrin en yüksek noktasında, gölet kenarında temiz hava alıp doğayla baş başa kalabileceğiniz kaçış noktası.", maps: "https://www.google.com/search?q=Aydos+Ormani+Kartal+Istanbul+Yol+Tarifi" },
+            bozdogan: { baslik: "Bozdoğan Su Kemeri", ilce: "Fatih", aktivite: "tarih", metin: "Fatih ilçesinin ortasında, Roma döneminden kalma ihtişamıyla şehri selamlayan devasa tarihi su kemeri.", maps: "https://www.google.com/search?q=Bozdogan+Kemeri+Fatih+Istanbul+Yol+Tarifi" },
+            belgrad: { baslik: "Belgrad Ormanı Bentleri", ilce: "Sarıyer", aktivite: "doga tarih", metin: "Osmanlı döneminde inşa edilmiş harika su bentlerinin devasa ağaçlar arasında sunduğu eşsiz yürüyüş rotası.", maps: "https://www.google.com/search?q=Belgrad+Ormani+Bentleri+Sariyer+Istanbul+Yol+Tarifi" }
+        };
+
+        let kullanicilar = JSON.parse(localStorage.getItem('sr_users')) || [
+            { user: 'admin', pass: 'admin123', role: 'admin', commentCount: 5, avatar: '', favoriler: [] }
+        ];
+        let aktifKullanici = JSON.parse(localStorage.getItem('sr_current_user')) || null;
+        let dinamikRotalar = JSON.parse(localStorage.getItem('sr_extra_routes')) || {};
+        let yorumVeritabani = JSON.parse(localStorage.getItem('sr_comments')) || { yoros: [], aydos: [], bozdogan: [], belgrad: [] };
+        
+        let fotografAkisi = JSON.parse(localStorage.getItem('sr_photos')) || [
+            { id: 1, yazar: "ahmet_kesifte", rota: "Yoros Kalesi", metin: "Harika bir hafta sonu sabahı!", img: "https://images.unsplash.com/photo-1541432901042-2d8bd64b4a9b?auto=format&fit=crop&w=400&q=80", yazarAvatar: "" },
+            { id: 2, yazar: "selin.yolda", rota: "Belgrad Bentleri", metin: "Doğa ve tarihin birleşimi harika.", img: "https://images.unsplash.com/photo-1599946347371-68eb71b16afc?auto=format&fit=crop&w=400&q=80", yazarAvatar: "" }
+        ];
+
+        let birlesikRotalar = {...varsayilanRotalar, ...dinamikRotalar};
+        let aktifMekanKey = "";
+
+        function unvanHesapla(yorumSayisi) {
+            if (yorumSayisi === 0) return "Çaylak Gezgin";
+            if (yorumSayisi >= 1 && yorumSayisi <= 2) return "Yol Açan Kaşif";
+            if (yorumSayisi >= 3 && yorumSayisi <= 4) return "Gezgin Üstadı";
+            return "İstanbul Muhtarı 👑";
+        }
+
+        function initApp() {
+            localStorage.setItem('sr_users', JSON.stringify(kullanicilar));
+            localStorage.setItem('sr_comments', JSON.stringify(yorumVeritabani));
+            localStorage.setItem('sr_photos', JSON.stringify(fotografAkisi));
+            
+            Object.keys(birlesikRotalar).forEach(key => {
+                if(!yorumVeritabani[key]) yorumVeritabani[key] = [];
+            });
+
+            arayuzGuncelle();
+            rotaListesiYazdir();
+            fotoAkisiniYazdir();
+        }
+
+        function avatarGetir(avatarBase64, ilkHarfler) {
+            if (avatarBase64) return `<img src="${avatarBase64}" alt="Profil">`;
+            return ilkHarfler.substring(0, 2);
+        }
+
+        function arayuzGuncelle() {
+            const profilAlani = document.getElementById("menuProfilAlani");
+            const authLink = document.getElementById("authMenuLinki");
+            const cikisLink = document.getElementById("cikisMenuLinki");
+            const adminLink = document.getElementById("adminMenuLinki");
+
+            if(aktifKullanici) {
+                if(!aktifKullanici.favoriler) aktifKullanici.favoriler = [];
+                let unvan = aktifKullanici.role === 'admin' ? "Yönetici" : unvanHesapla(aktifKullanici.commentCount);
+                let badge = aktifKullanici.role === 'admin' ? '<span class="admin-badge">ADMIN</span>' : '';
+                
+                profilAlani.innerHTML = `
+                    <div class="menu-avatar">${avatarGetir(aktifKullanici.avatar, aktifKullanici.user)}</div>
+                    <div>
+                        <div style="font-weight:600; font-size:14px;">${aktifKullanici.user} ${badge}</div>
+                        <div style="font-size:11px; color:var(--text-muted);">${unvan}</div>
+                    </div>
+                `;
+                authLink.style.display = "none";
+                cikisLink.style.display = "flex";
+                adminLink.style.display = aktifKullanici.role === 'admin' ? "flex" : "none";
+            } else {
+                profilAlani.innerHTML = `
+                    <div class="menu-avatar">?</div>
+                    <div>
+                        <div style="font-weight:600; font-size:14px;">Misafir Kullanıcı</div>
+                        <div style="font-size:11px; color:var(--text-muted);">Lütfen Giriş Yapın</div>
+                    </div>
+                `;
+                authLink.style.display = "flex";
+                cikisLink.style.display = "none";
+                adminLink.style.display = "none";
+            }
+            profilSayfasiYazdir();
+            yorumFormuYazdir();
+            fotoFormuYazdir();
+        }
+
+        function rotaListesiYazdir() {
+            const listeContainer = document.getElementById("anaRotaListesiElementi");
+            listeContainer.innerHTML = "";
+            Object.keys(birlesikRotalar).forEach(key => {
+                const r = birlesikRotalar[key];
+                listeContainer.innerHTML += `
+                    <div class="mekan-karti" data-ilce="${r.ilce}" data-aktivite="${r.aktivite}" id="kart-${key}" onclick="mekanSec('${key}')">
+                        <div>
+                            <div style="font-weight: 500; font-size: 14px;">${r.baslik}</div>
+                            <div class="alt-bilgi">Bölge: ${r.ilce} | Tipler: ${r.aktivite}</div>
+                        </div>
+                        <button disabled style="padding: 4px 10px; font-size: 10px;">Git</button>
+                    </div>
+                `;
+            });
+        }
+
+        function rotalariFiltrele() {
+            const ilceSecim = document.getElementById("filtreIlce").value;
+            const aktSecim = document.getElementById("filtreAkt").value;
+            Object.keys(birlesikRotalar).forEach(key => {
+                const kart = document.getElementById(`kart-${key}`);
+                if(!kart) return;
+                let ilceUyum = (ilceSecim === "all" || kart.getAttribute("data-ilce") === ilceSecim);
+                let aktUyum = (aktSecim === "all" || kart.getAttribute("data-aktivite").split(" ").includes(aktSecim));
+                kart.style.display = (ilceUyum && aktUyum) ? "flex" : "none";
+            });
+        }
+
+        function hesapKayitOl() {
+            const u = document.getElementById("kayitUser").value.trim();
+            const p = document.getElementById("kayitPass").value.trim();
+            if(!u || !p) return alert("Eksik bilgi bırakmayın.");
+            if(kullanicilar.find(x => x.user.toLowerCase() === u.toLowerCase())) return alert("Bu kullanıcı adı alınmış.");
+
+            const yeniUye = { user: u, pass: p, role: 'user', commentCount: 0, avatar: '', favoriler: [] };
+            kullanicilar.push(yeniUye);
+            localStorage.setItem('sr_users', JSON.stringify(kullanicilar));
+            alert("Kayıt başarılı! Şimdi giriş yapabilirsiniz.");
+            document.getElementById("kayitUser").value = "";
+            document.getElementById("kayitPass").value = "";
+        }
+
+        function hesapGirisYap() {
+            const u = document.getElementById("girisUser").value.trim();
+            const p = document.getElementById("girisPass").value.trim();
+            const bul = kullanicilar.find(x => x.user === u && x.pass === p);
+            if(!bul) return alert("Hatalı kullanıcı adı veya şifre!");
+
+            aktifKullanici = bul;
+            localStorage.setItem('sr_current_user', JSON.stringify(aktifKullanici));
+            alert(`Hoş geldin, ${u}!`);
+            panelKapat('authPanel');
+            document.getElementById("girisUser").value = "";
+            document.getElementById("girisPass").value = "";
+            arayuzGuncelle();
+            fotoAkisiniYazdir();
+            if(aktifMekanKey) mekanSec(aktifMekanKey);
+        }
+
+        function hesapCikisyap() {
+            aktifKullanici = null;
+            localStorage.removeItem('sr_current_user');
+            menuToggle(false);
+            arayuzGuncelle();
+            fotoAkisiniYazdir();
+            if(aktifMekanKey) mekanSec(aktifMekanKey);
+            alert("Güvenli çıkış yapıldı.");
+        }
+
+        function mekanSec(key) {
+            aktifMekanKey = key;
+            const veri = birlesikRotalar[key];
+            if(!veri) return;
+
+            document.getElementById("detayBaslik").innerText = veri.baslik;
+            document.getElementById("detayMetin").innerText = veri.metin;
+            document.getElementById("haritaKonteyner").style.display = "block";
+            document.getElementById("yorumAlaniKonteyner").style.display = "block";
+            document.getElementById("haritaAramaLinki").href = veri.maps;
+
+            favoriButonuYazdir();
+            skorHesaplaVeYazdir();
+            yorumlarListele();
+            yorumFormuYazdir();
+        }
+
+        function favoriButonuYazdir() {
+            const fBtnAlan = document.getElementById("favoriBtnAlani");
+            if(!aktifKullanici) { fBtnAlan.innerHTML = ""; return; }
+            
+            const isFav = aktifKullanici.favoriler && aktifKullanici.favoriler.includes(aktifMekanKey);
+            fBtnAlan.innerHTML = `<button onclick="favoriDegistir('${aktifMekanKey}')" style="background:none; font-size:20px; padding:0; cursor:pointer;">${isFav ? '❤️' : '🤍'}</button>`;
+        }
+
+        function favoriDegistir(key) {
+            if(!aktifKullanici) return;
+            if(!aktifKullanici.favoriler) aktifKullanici.favoriler = [];
+
+            const idx = aktifKullanici.favoriler.indexOf(key);
+            if(idx > -1) {
+                aktifKullanici.favoriler.splice(idx, 1);
+            } else {
+                aktifKullanici.favoriler.push(key);
+            }
+
+            const uIdx = kullanicilar.findIndex(x => x.user === aktifKullanici.user);
+            if(uIdx > -1) kullanicilar[uIdx].favoriler = aktifKullanici.favoriler;
+
+            localStorage.setItem('sr_users', JSON.stringify(kullanicilar));
+            localStorage.setItem('sr_current_user', JSON.stringify(aktifKullanici));
+            
+            favoriButonuYazdir();
+            profilSayfasiYazdir();
+        }
+
+        function yorumFormuYazdir() {
+            const fContainer = document.getElementById("yorumYazmaFormu");
+            if(!aktifKullanici) {
+                fContainer.innerHTML = `<p style="font-size:12px; color:#ff4d4d; text-align:center;">⚠️ Değerlendirme yapabilmek için giriş yapmalısınız.</p>`;
+                return;
+            }
+            fContainer.innerHTML = `
+                <div class="sosyal-form">
+                    <div class="girdi-satiri" style="display:flex; gap:8px;">
+                        <select id="puanSecimi" style="flex:1;">
+                            <option value="5">⭐⭐⭐⭐⭐ (5)</option>
+                            <option value="4">⭐⭐⭐⭐ (4)</option>
+                            <option value="3">⭐⭐⭐ (3)</option>
+                            <option value="2">⭐⭐ (2)</option>
+                            <option value="1">⭐ (1)</option>
+                        </select>
+                    </div>
+                    <div class="girdi-satiri" style="display:flex; gap:8px; margin-top:8px;">
+                        <input type="text" id="yorumMetniGirdisi" placeholder="Deneyimlerinizi paylaşın..." style="flex:1;">
+                        <button onclick="yorumEkle()" style="background: var(--text-main); color: white;">Gönder</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function yorumEkle() {
+            const metin = document.getElementById("yorumMetniGirdisi").value.trim();
+            const yildiz = parseInt(document.getElementById("puanSecimi").value);
+            if(!metin) return;
+
+            let unvan = aktifKullanici.role === 'admin' ? "Yönetici" : unvanHesapla(aktifKullanici.commentCount);
+            const yeniYorum = { id: Date.now(), yazar: aktifKullanici.user, unvan: unvan, metin: metin, puan: yildiz, begeni: 0, begenenler: [] };
+            
+            yorumVeritabani[aktifMekanKey].push(yeniYorum);
+            localStorage.setItem('sr_comments', JSON.stringify(yorumVeritabani));
+
+            if(aktifKullanici.role !== 'admin') {
+                const uIndex = kullanicilar.findIndex(x => x.user === aktifKullanici.user);
+                kullanicilar[uIndex].commentCount += 1;
+                aktifKullanici.commentCount += 1;
+                localStorage.setItem('sr_users', JSON.stringify(kullanicilar));
+                localStorage.setItem('sr_current_user', JSON.stringify(aktifKullanici));
+            }
+            document.getElementById("yorumMetniGirdisi").value = "";
+            skorHesaplaVeYazdir();
+            yorumlarListele();
+            arayuzGuncelle();
+        }
+
+        function yorumlarListele() {
+            const vAlan = document.getElementById("yorumListesiGorunumu");
+            vAlan.innerHTML = "";
+            const list = yorumVeritabani[aktifMekanKey] || [];
+            if(list.length === 0) {
+                vAlan.innerHTML = `<div class="yorum-tekil" style="color:var(--text-muted)">Henüz hiç yorum yok. İlk adımı sen at!</div>`;
+                return;
+            }
+            list.forEach(y => {
+                let adminSilmeButonu = (aktifKullanici && aktifKullanici.role === 'admin') ? 
+                    `<button class="admin-sil-btn" onclick="adminYorumSil('${aktifMekanKey}', ${y.id})">Sil</button>` : '';
+                
+                if(!y.begeni) y.begeni = 0;
+                if(!y.begenenler) y.begenenler = [];
+                const begenildiMi = aktifKullanici && y.begenenler.includes(aktifKullanici.user);
+
+                vAlan.innerHTML += `
+                    <div class="yorum-tekil">
+                        <div class="yorum-ust-bilgi">
+                            <span>👤 ${y.yazar} <span class="unvan-etiket">${y.unvan}</span></span>
+                            <span>${"⭐".repeat(y.puan)}</span>
+                        </div>
+                        <div style="margin-bottom:6px;">${y.metin}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <button class="like-btn ${begenildiMi ? 'begenildi' : ''}" onclick="yorumBegen('${aktifMekanKey}', ${y.id})">
+                                👍 <span>${y.begeni}</span> Beğeni
+                            </button>
+                            ${adminSilmeButonu}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function yorumBegen(mekanKey, yorumId) {
+            if(!aktifKullanici) return alert("Yorumları beğenmek için giriş yapmalısınız.");
+            
+            const yorum = yorumVeritabani[mekanKey].find(x => x.id === yorumId);
+            if(!yorum) return;
+
+            if(!yorum.begenenler) yorum.begenenler = [];
+            
+            const uIdx = yorum.begenenler.indexOf(aktifKullanici.user);
+            if(uIdx > -1) {
+                yorum.begenenler.splice(uIdx, 1);
+                yorum.begeni--;
+            } else {
+                yorum.begenenler.push(aktifKullanici.user);
+                yorum.begeni++;
+            }
+
+            localStorage.setItem('sr_comments', JSON.stringify(yorumVeritabani));
+            yorumlarListele();
+        }
+
+        function skorHesaplaVeYazdir() {
+            const sAlan = document.getElementById("skorAlani");
+            const list = yorumVeritabani[aktifMekanKey] || [];
+            if(list.length === 0) { sAlan.innerHTML = `<span class="skor-etiket">⭐ Puanlanmamış</span>`; return; }
+            let top = list.reduce((acc, current) => acc + current.puan, 0);
+            let ort = (top / list.length).toFixed(1);
+            sAlan.innerHTML = `<span class="skor-etiket">⭐ ${ort} / 5 (${list.length} Kaşif Yorumu)</span>`;
+        }
+
+        function profilSayfasiYazdir() {
+            const pIcerik = document.getElementById("profilDetayIcerik");
+            if(!aktifKullanici) {
+                pIcerik.innerHTML = `<p style="text-align:center; color:var(--text-muted)">Profilinizi görebilmek için önce giriş yapmalısınız.</p>`;
+                return;
+            }
+            let unvan = aktifKullanici.role === 'admin' ? "Sistem Yöneticisi" : unvanHesapla(aktifKullanici.commentCount);
+            
+            let favRotalarMetni = "";
+            if(aktifKullanici.favoriler && aktifKullanici.favoriler.length > 0) {
+                aktifKullanici.favoriler.forEach(fk => {
+                    if(birlesikRotalar[fk]) favRotalarMetni += `<span class="unvan-etiket" style="display:inline-block; margin:2px; background:var(--accent); color:white; padding:4px 10px; border-radius:12px;">📍 ${birlesikRotalar[fk].baslik}</span>`;
+                });
+            } else {
+                favRotalarMetni = `<span style="font-size:12px; color:var(--text-muted);">Henüz hiçbir rotayı favorilemediniz.</span>`;
+            }
+
+            pIcerik.innerHTML = `
+                <div class="panel" style="text-align: center; margin-bottom: 15px;">
+                    <div id="profilAvatarKonteyner">
+                        ${aktifKullanici.avatar ? `<img src="${aktifKullanici.avatar}" class="profil-resim-buyuk">` : `<div class="menu-avatar" style="width:70px; height:70px; font-size:22px; margin:0 auto 10px auto;">${aktifKullanici.user.substring(0,2)}</div>`}
+                    </div>
+                    <h3 style="margin: 0;">${aktifKullanici.user}</h3>
+                    <span class="skor-etiket" style="background:#6b8276; color:white; margin-bottom:10px;">${unvan}</span>
+                    
+                    <div class="ozel-dosya-yukle" style="padding:8px;" onclick="document.getElementById('profilFotoInput').click()">
+                        📷 Fotoğraf Değiştir
+                        <input type="file" id="profilFotoInput" accept="image/*" style="display:none;" onchange="profilFotoIsle(this)">
+                    </div>
+                </div>
+
+                <div class="panel" style="margin-bottom:15px;">
+                    <div class="panel-baslik">⚙️ Gezgin Adını Değiştir</div>
+                    <div style="display:flex; gap:8px;">
+                        <input type="text" id="yeniKullaniciAdiInput" value="${aktifKullanici.user}" placeholder="Yeni adınız..." style="flex:1;">
+                        <button onclick="kullaniciAdiDegistir()" style="background:var(--text-main); color:white;">Güncelle</button>
+                    </div>
+                </div>
+
+                <div class="panel-baslik">Katkı Durumun</div>
+                <div class="panel" style="display:flex; justify-content:space-around; text-align:center; margin-bottom:15px;">
+                    <div><b>${aktifKullanici.commentCount}</b><div style="font-size:10px; color:var(--text-muted)">Yazılan Yorum</div></div>
+                    <div><b>${aktifKullanici.role === 'admin' ? 'Sınırsız' : 'Seviye ' + (Math.floor(aktifKullanici.commentCount / 2) + 1)}</b><div style="font-size:10px; color:var(--text-muted)">Mevcut Rütbe</div></div>
+                </div>
+
+                <div class="panel-baslik">❤️ Favori Rotalarım</div>
+                <div class="panel">${favRotalarMetni}</div>
+            `;
+        }
+
+        function kullaniciAdiDegistir() {
+            const yeniAd = document.getElementById("yeniKullaniciAdiInput").value.trim();
+            if(!yeniAd) return alert("Kullanıcı adı boş bırakılamaz.");
+            if(yeniAd === aktifKullanici.user) return alert("Mevcut adınızla aynı.");
+            if(kullanicilar.find(x => x.user.toLowerCase() === yeniAd.toLowerCase())) return alert("Bu isim başka bir gezgin tarafından kapılmış.");
+
+            const eskiAd = aktifKullanici.user;
+
+            const uIdx = kullanicilar.findIndex(x => x.user === eskiAd);
+            if(uIdx > -1) kullanicilar[uIdx].user = yeniAd;
+
+            aktifKullanici.user = yeniAd;
+
+            Object.keys(yorumVeritabani).forEach(key => {
+                yorumVeritabani[key].forEach(y => {
+                    if(y.yazar === eskiAd) y.yazar = yeniAd;
+                    if(y.begenenler) {
+                        const bIdx = y.begenenler.indexOf(eskiAd);
+                        if(bIdx > -1) y.begenenler[bIdx] = yeniAd;
+                    }
+                });
+            });
+
+            fotografAkisi.forEach(f => {
+                if(f.yazar === eskiAd) f.yazar = yeniAd;
+            });
+
+            localStorage.setItem('sr_users', JSON.stringify(kullanicilar));
+            localStorage.setItem('sr_current_user', JSON.stringify(aktifKullanici));
+            localStorage.setItem('sr_comments', JSON.stringify(yorumVeritabani));
+            localStorage.setItem('sr_photos', JSON.stringify(fotografAkisi));
+
+            alert("Gezgin adınız güncellendi! Eski tüm yorum ve fotoğraflarınız yeni adınıza aktarıldı.");
+            arayuzGuncelle();
+            fotoAkisiniYazdir();
+            if(aktifMekanKey) mekanSec(aktifMekanKey);
+        }
+
+        function profilFotoIsle(input) {
+            if (input.files && input.files[0]) {
+                const okuyucu = new FileReader();
+                okuyucu.onload = function(e) {
+                    const base64Gorsel = e.target.result;
+                    aktifKullanici.avatar = base64Gorsel;
+                    const idx = kullanicilar.findIndex(x => x.user === aktifKullanici.user);
+                    if(idx !== -1) kullanicilar[idx].avatar = base64Gorsel;
+
+                    localStorage.setItem('sr_users', JSON.stringify(kullanicilar));
+                    localStorage.setItem('sr_current_user', JSON.stringify(aktifKullanici));
+                    
+                    alert("Profil fotoğrafınız güncellendi!");
+                    arayuzGuncelle();
+                    fotoAkisiniYazdir();
+                }
+                okuyucu.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function fotoFormuYazdir() {
+            const fFormAlan = document.getElementById("fotoPaylasimFormuKonteyner");
+            if(!aktifKullanici) {
+                fFormAlan.innerHTML = `<p style="font-size:12px; color:var(--text-muted); text-align:center; margin:0;">🔒 Rotalarda çektiğiniz fotoğrafları paylaşmak için lütfen giriş yapın.</p>`;
+                return;
+            }
+            
+            let rotaSecenekleri = "";
+            Object.keys(birlesikRotalar).forEach(key => {
+                rotaSecenekleri += `<option value="${birlesikRotalar[key].baslik}">${birlesikRotalar[key].baslik}</option>`;
+            });
+
+            fFormAlan.innerHTML = `
+                <div class="panel-baslik">📸 Yeni Bir Keşif Fotoğrafı Paylaş</div>
+                <div class="form-grubu">
+                    <select id="fotoRotaSecim">${rotaSecenekleri}</select>
+                    <input type="text" id="fotoMetinGirdi" placeholder="Fotoğraf altına bir açıklama ekleyin (İsteğe bağlı)">
+                    <div class="ozel-dosya-yukle" id="akisaYukleAlan" onclick="document.getElementById('akisFotoInput').click()">
+                        🖼️ Rota Fotoğrafı Seç
+                    </div>
+                    <input type="file" id="akisFotoInput" accept="image/*" style="display:none;" onchange="akisFotoHazirla(this)">
+                    <button onclick="akisFotoPaylas()" style="background:var(--accent); color:white; margin-top:5px;">Akışta Yayınla</button>
+                </div>
+            `;
+        }
+
+        let geciciAkisGorselBase64 = "";
+        function akisFotoHazirla(input) {
+            if (input.files && input.files[0]) {
+                const okuyucu = new FileReader();
+                okuyucu.onload = function(e) {
+                    geciciAkisGorselBase64 = e.target.result;
+                    document.getElementById("akisaYukleAlan").innerText = "✅ Fotoğraf Başarıyla Seçildi!";
+                    document.getElementById("akisaYukleAlan").style.borderColor = "#4285F4";
+                }
+                okuyucu.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function akisFotoPaylas() {
+            const rota = document.getElementById("fotoRotaSecim").value;
+            const metin = document.getElementById("fotoMetinGirdi").value.trim();
+
+            if(!geciciAkisGorselBase64) return alert("Lütfen bir fotoğraf seçin!");
+
+            const yeniPaylasim = {
+                id: Date.now(),
+                yazar: aktifKullanici.user,
+                rota: rota,
+                metin: metin ? metin : "Keşif anından güzel bir kare...", // Boşsa varsayılan metin atanır
+                img: geciciAkisGorselBase64,
+                yazarAvatar: aktifKullanici.avatar || ""
+            };
+
+            fotografAkisi.unshift(yeniPaylasim);
+            localStorage.setItem('sr_photos', JSON.stringify(fotografAkisi));
+            
+            alert("Harika! Fotoğrafınız Keşif Akışına eklendi.");
+            geciciAkisGorselBase64 = "";
+            fotoFormuYazdir();
+            fotoAkisiniYazdir();
+        }
+
+        function fotoAkisiniYazdir() {
+            const akisIzgara = document.getElementById("kullaniciFotoAkisi");
+            akisIzgara.innerHTML = "";
+
+            fotografAkisi.forEach(f => {
+                let yazarHafizaVerisi = kullanicilar.find(x => x.user === f.yazar);
+                let guncelAvatar = yazarHafizaVerisi ? yazarHafizaVerisi.avatar : f.yazarAvatar;
+
+                let avatarBileseni = guncelAvatar ? 
+                    `<img src="${guncelAvatar}" style="width:18px; height:18px; border-radius:50%; object-fit:cover; display:inline-block; vertical-align:middle; margin-right:5px;">` : '👤 ';
+
+                let adminSilmeButonu = (aktifKullanici && aktifKullanici.role === 'admin') ? 
+                    `<button class="admin-sil-btn" style="padding:1px 6px; font-size:9px;" onclick="adminFotoSil(${f.id})">Sil</button>` : '';
+
+                akisIzgara.innerHTML += `
+                    <div class="foto-kart">
+                        <img src="${f.img}">
+                        <div class="foto-detay-alan">
+                            <div class="foto-yazar">
+                                <span>${avatarBileseni}${f.yazar}</span>
+                                ${adminSilmeButonu}
+                            </div>
+                            <div style="font-weight:700; font-size:10px; color:var(--text-muted)">📍 ${f.rota}</div>
+                            <div style="margin-top:2px; color:var(--text-main); line-height:1.2;">${f.metin}</div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function adminUyeListesiYazdir() {
+            const uAlan = document.getElementById("adminUyeListesi");
+            uAlan.innerHTML = "";
+            kullanicilar.forEach(u => {
+                uAlan.innerHTML += `<div>• <b>${u.user}</b> - Rol: ${u.role} | Yorum: ${u.commentCount}</div>`;
+            });
+        }
+
+        function adminYorumSil(mekanKey, yorumId) {
+            if(confirm("Bu yorumu silmek istediğinize emin misiniz?")) {
+                yorumVeritabani[mekanKey] = yorumVeritabani[mekanKey].filter(y => y.id !== yorumId);
+                localStorage.setItem('sr_comments', JSON.stringify(yorumVeritabani));
+                yorumlarListele();
+                skorHesaplaVeYazdir();
+            }
+        }
+
+        function adminFotoSil(fotoId) {
+            if(confirm("Bu fotoğrafı akıştan kaldırmak istediğinize emin misiniz?")) {
+                fotografAkisi = fotografAkisi.filter(f => f.id !== fotoId);
+                localStorage.setItem('sr_photos', JSON.stringify(fotografAkisi));
+                fotoAkisiniYazdir();
+            }
+        }
+
+        function adminRotaEkle() {
+            const id = document.getElementById("admRotaId").value.trim();
+            const ad = document.getElementById("admRotaAd").value.trim();
+            const ilce = document.getElementById("admRotaIlce").value.trim();
+            const akt = document.getElementById("admRotaAkt").value.trim();
+            const metin = document.getElementById("admRotaMetin").value.trim();
+
+            if(!id || !ad || !ilce || !akt || !metin) return alert("Tüm alanları doldurun.");
+
+            const yeniRota = {
+                baslik: ad, ilce: ilce, aktivite: akt, metin: metin,
+                maps: `https://www.google.com/search?q=${encodeURIComponent(ad)}+${encodeURIComponent(ilce)}+Istanbul+Yol+Tarifi`
+            };
+
+            dinamikRotalar[id] = yeniRota;
+            localStorage.setItem('sr_extra_routes', JSON.stringify(dinamikRotalar));
+            birlesikRotalar = {...varsayilanRotalar, ...dinamikRotalar};
+            if(!yorumVeritabani[id]) yorumVeritabani[id] = [];
+            localStorage.setItem('sr_comments', JSON.stringify(yorumVeritabani));
+
+            alert(`${ad} rotası sisteme katıldı!`);
+            document.getElementById("admRotaId").value = "";
+            document.getElementById("admRotaAd").value = "";
+            document.getElementById("admRotaMetin").value = "";
+            rotaListesiYazdir();
+            fotoFormuYazdir(); 
+        }
+
+        function menuToggle(acikMi) {
+            const menu = document.getElementById("yanMenu");
+            const ortu = document.getElementById("menuOrtu");
+            if(acikMi) { menu.classList.add("acik"); ortu.style.display = "block"; } 
+            else { menu.classList.remove("acik"); ortu.style.display = "none"; }
+        }
+        function panelAc(id) { menuToggle(false); document.getElementById(id).style.display = "block"; if(id === 'adminPanel') adminUyeListesiYazdir(); }
+        function panelKapat(id) { document.getElementById(id).style.display = "none"; }
+        function temaDegistir() { document.body.classList.toggle("gece-modu"); }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
